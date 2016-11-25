@@ -17,10 +17,10 @@ import java.util.ArrayList;
 
 public class ImageAdaptor extends BaseAdapter {
 
-    private ArrayList<String> movies;
+    private ArrayList<Movie> movies;
     private Context context;
 
-    public ImageAdaptor(Context context, ArrayList<String> movies) {
+    public ImageAdaptor(Context context, ArrayList<Movie> movies) {
         this.movies = movies;
         this.context = context;
     }
@@ -45,7 +45,7 @@ public class ImageAdaptor extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         View imageView = inflater.inflate(R.layout.movie_image, viewGroup, false);
         ImageView image = (ImageView) imageView.findViewById(R.id.movie_display);
-        Picasso.with(context).load("http://image.tmdb.org/t/p/w185/" + movies.get(i)).into(image);
+        Picasso.with(context).load("http://image.tmdb.org/t/p/w185/" + movies.get(i).getPoster()).into(image);
         return imageView;
     }
 }
