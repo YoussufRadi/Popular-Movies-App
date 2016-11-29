@@ -1,5 +1,6 @@
 package com.malproject.youssufradi.movieapp;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -49,6 +51,15 @@ public class MainFragment extends Fragment {
 //        fake.add("/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg");
         gridView = (GridView) rootView.findViewById(R.id.grid_view);
         new FetchDataFromApi().execute("popular");
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Movie movieDetails = mImageAdaptor.getItem(i);
+                Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("Movie",movieDetails);
+                startActivity(intent);
+            }
+        });
         return rootView;
     }
 
@@ -72,11 +83,11 @@ public class MainFragment extends Fragment {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-                final String FORECAST_BASE_URL =
+                final String MOVIES_BASE_URL =
                         "http://api.themoviedb.org/3/movie/" + params[0] + "?api_key=8c79e11ad73fea8dbe678fee8de573e6";
                 final String QUERY_PARAM = "api_key";
 
-                Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
 //                    .appendQueryParameter(QUERY_PARAM, BuildConfig. )
                         .build();
 

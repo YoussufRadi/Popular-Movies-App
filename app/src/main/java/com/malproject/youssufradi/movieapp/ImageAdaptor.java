@@ -31,7 +31,7 @@ public class ImageAdaptor extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int i) {
+    public Movie getItem(int i) {
         return movies.get(i);
     }
 
