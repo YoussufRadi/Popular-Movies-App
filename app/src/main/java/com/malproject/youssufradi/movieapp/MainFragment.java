@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +31,7 @@ public class MainFragment extends Fragment {
 
     private ImageAdaptor mImageAdaptor;
     private GridView gridView;
+    private ArrayList<Movie> movies;
 
     public MainFragment() {
         // Required empty public constructor
@@ -38,6 +40,14 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState != null && savedInstanceState.containsKey("Movies"))
+            movies = savedInstanceState.<Movie>getParcelableArrayList("Movies");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("Movies", movies);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -88,7 +98,6 @@ public class MainFragment extends Fragment {
                 // http://openweathermap.org/API#forecast
                 final String MOVIES_BASE_URL =
                         "http://api.themoviedb.org/3/movie/" + params[0] + "?api_key=8c79e11ad73fea8dbe678fee8de573e6";
-                final String QUERY_PARAM = "api_key";
 
                 Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
 //                    .appendQueryParameter(QUERY_PARAM, BuildConfig. )
@@ -154,7 +163,7 @@ public class MainFragment extends Fragment {
 
         private ArrayList<Movie> getMoviesFromJSON(String moviesJsonStr) throws JSONException {
 
-            ArrayList<Movie> moviesToDisplay = new ArrayList<Movie>();
+            ArrayList<Movie> moviesToDisplay = movies = new ArrayList<Movie>();
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray("results");
 
@@ -171,6 +180,10 @@ public class MainFragment extends Fragment {
         }
 
         protected void onPostExecute(ArrayList<Movie> result) {
+            if(result == null) {
+                Toast.makeText(getActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+                return;
+            }
             mImageAdaptor = new ImageAdaptor(getActivity(),result);
             gridView.setAdapter(mImageAdaptor);
         }

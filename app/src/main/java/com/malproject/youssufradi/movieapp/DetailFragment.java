@@ -47,7 +47,7 @@ public class DetailFragment extends Fragment {
                     .setText(detailMovie.getReleaseDate());
             ((TextView) rootView.findViewById(R.id.movie_date))
                     .setText(detailMovie.getReleaseDate());
-            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185/" + detailMovie.getPoster()).into((ImageView) rootView.findViewById(R.id.movie_poster));
+            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w780/" + detailMovie.getPoster()).into((ImageView) rootView.findViewById(R.id.movie_poster));
         }
         return rootView;
     }

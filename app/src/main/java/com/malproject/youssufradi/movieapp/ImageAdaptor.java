@@ -35,6 +35,15 @@ public class ImageAdaptor extends BaseAdapter {
         return movies.get(i);
     }
 
+    public ArrayList<Movie> getMovies() {
+        return movies;
+    }
+
+
+    public void setMovies(ArrayList<Movie> movies) {
+        this.movies = movies;
+    }
+
     @Override
     public long getItemId(int i) {
         return i;
@@ -45,7 +54,7 @@ public class ImageAdaptor extends BaseAdapter {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         View imageView = inflater.inflate(R.layout.movie_image, viewGroup, false);
         ImageView image = (ImageView) imageView.findViewById(R.id.movie_display);
-        Picasso.with(context).load("http://image.tmdb.org/t/p/w185/" + movies.get(i).getPoster()).into(image);
+        Picasso.with(context).load("http://image.tmdb.org/t/p/w500/" + movies.get(i).getPoster()).into(image);
         return imageView;
     }
 }
