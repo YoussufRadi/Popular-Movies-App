@@ -8,7 +8,6 @@
     <TextView
         android:layout_width="191dp"
         android:layout_height="44dp"
-        android:text="@string/hello_blank_fragment"
         android:id="@+id/movie_title" />
     <ImageView
         android:id="@+id/movie_poster"

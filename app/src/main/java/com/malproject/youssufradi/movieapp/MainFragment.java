@@ -24,6 +24,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static android.content.ContentValues.TAG;
+
 public class MainFragment extends Fragment {
 
     private ImageAdaptor mImageAdaptor;
@@ -57,6 +59,7 @@ public class MainFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Movie movieDetails = mImageAdaptor.getItem(i);
                 Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("Movie",movieDetails);
+                Log.d(TAG, movieDetails.getTitle() +"");
                 startActivity(intent);
             }
         });
