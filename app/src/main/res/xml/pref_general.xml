@@ -7,7 +7,7 @@
     <ListPreference
         android:defaultValue="string/sort_value"
         android:entries="@array/sort_values"
-        android:entryValues="@array/sort_values"
+        android:entryValues="@array/sort_array"
         android:key="@string/sort_value"
         android:title="@string/sort_string" />
 

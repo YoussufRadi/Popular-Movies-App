@@ -93,6 +93,20 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateSearch();
+    }
+
+    public void updateSearch(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortKey = prefs.getString(getString(R.string.sort_value),
+                            getString(R.string.sort_value));
+        Toast.makeText(getActivity(),sortKey,Toast.LENGTH_SHORT).show();
+        new FetchDataFromApi().execute(sortKey);
+    }
+
     /**
      * Created by y_sam on 11/25/2016.
      */
@@ -187,7 +201,8 @@ public class MainFragment extends Fragment {
             for(int i = 0; i < moviesArray.length(); i++){
                 JSONObject movieObject = moviesArray.getJSONObject(i);
                 Log.v(LOG_TAG,movieObject.toString());
-                moviesToDisplay.add(new Movie(movieObject.getString("title"),
+                moviesToDisplay.add(new Movie(movieObject.getString("id"),
+                        movieObject.getString("title"),
                         movieObject.getString("poster_path"),
                         movieObject.getString("overview"),
                         movieObject.getString("vote_average"),
