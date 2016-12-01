@@ -9,7 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,8 +34,12 @@ import static android.content.ContentValues.TAG;
 public class DetailFragment extends Fragment {
 
     private Movie detailMovie;
-    private ArrayList<String> reviews;
-    private ArrayList<String> trailers;
+    private ArrayList<Info> reviews;
+    private ArrayList<Info> trailers;
+    private ListView reviewList;
+    private ListView trailerList;
+    private InfoAdapter reviewInfoAdapter;
+    private InfoAdapter trailerInfoAdapter;
 
     public DetailFragment() {
         // Required empty public constructor
@@ -65,17 +71,28 @@ public class DetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.movie_release_date))
                     .setText(detailMovie.getReleaseDate());
             Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w500/" + detailMovie.getPoster()).into((ImageView) rootView.findViewById(R.id.movie_poster));
-            Toast.makeText(getActivity(),detailMovie.getPoster(),Toast.LENGTH_SHORT).show();
+            reviewList = (ListView) rootView.findViewById(R.id.review_list);
+            trailerList = (ListView) rootView.findViewById(R.id.trailer_list);
+            //new FetchDataFromApi().execute("reviews");
+            new FetchDataFromApi().execute("videos");
+            trailerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Info info = trailerInfoAdapter.getItem(i);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="+info.getDetails()));
+                    startActivity(intent);
+                }
+            });
         }
         return rootView;
     }
 
-    class FetchDataFromApi extends AsyncTask<String,Void,ArrayList<String>> {
+    class FetchDataFromApi extends AsyncTask<String,Void,ArrayList<Info>> {
 
         private final String LOG_TAG = MainFragment.FetchDataFromApi.class.getSimpleName();
-        private boolean rev = true;
+        private boolean rev = false;
         @Override
-        protected ArrayList<String> doInBackground(String... params) {
+        protected ArrayList<Info> doInBackground(String... params) {
             if (params.length == 0) {
                 return null;
             }
@@ -154,30 +171,41 @@ public class DetailFragment extends Fragment {
             return null;
         }
 
-        private ArrayList<String> getDataFromJSON(String jsonStr) throws JSONException {
+        private ArrayList<Info> getDataFromJSON(String jsonStr) throws JSONException {
 
             ArrayList<String> dataToDisplay = new ArrayList<String>();
             JSONObject json = new JSONObject(jsonStr);
             JSONArray array = json.getJSONArray("results");
-
+            if(rev)
+                reviews = new ArrayList<Info>();
+            else
+                trailers = new ArrayList<Info>();
             for(int i = 0; i < array.length(); i++){
                 JSONObject movieObject = array.getJSONObject(i);
-                Log.v(LOG_TAG,movieObject.toString());
                 if(rev)
-                    reviews.add(movieObject.getString("id").toString());
+                    reviews.add(new Info(movieObject.getString("author").toString(), movieObject.getString("content").toString()));
                 else
-                    trailers.add(movieObject.getString("id").toString());
+                    trailers.add(new Info(movieObject.getString("name").toString(),movieObject.getString("key").toString()));
             }
-            return reviews;
+            if(rev)
+                return reviews;
+            else
+                return trailers;
         }
 
-        protected void onPostExecute(ArrayList<Movie> result) {
+        protected void onPostExecute(ArrayList<Info> result) {
             if(result == null) {
                 Toast.makeText(getActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
                 return;
             }
-//            mImageAdaptor = new ImageAdaptor(getActivity(),result);
-//            gridView.setAdapter(mImageAdaptor);
+            if(rev) {
+                reviewInfoAdapter = new InfoAdapter(getActivity(), reviews);
+                reviewList.setAdapter(reviewInfoAdapter);
+            }
+            else {
+                trailerInfoAdapter = new InfoAdapter(getActivity(), trailers);
+                trailerList.setAdapter(trailerInfoAdapter);
+            }
         }
     }
 

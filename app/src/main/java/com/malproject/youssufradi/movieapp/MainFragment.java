@@ -32,7 +32,7 @@ import static android.content.ContentValues.TAG;
 
 public class MainFragment extends Fragment {
 
-    private ImageAdaptor mImageAdaptor;
+    private ImageAdapter mImageAdapter;
     private GridView gridView;
     private ArrayList<Movie> movies;
 
@@ -84,9 +84,8 @@ public class MainFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Movie movieDetails = mImageAdaptor.getItem(i);
+                Movie movieDetails = mImageAdapter.getItem(i);
                 Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("Movie",movieDetails);
-                Log.d(TAG, movieDetails.getTitle() +"");
                 startActivity(intent);
             }
         });
@@ -200,7 +199,6 @@ public class MainFragment extends Fragment {
 
             for(int i = 0; i < moviesArray.length(); i++){
                 JSONObject movieObject = moviesArray.getJSONObject(i);
-                Log.v(LOG_TAG,movieObject.toString());
                 moviesToDisplay.add(new Movie(movieObject.getString("id"),
                         movieObject.getString("title"),
                         movieObject.getString("poster_path"),
@@ -216,8 +214,8 @@ public class MainFragment extends Fragment {
                 Toast.makeText(getActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show();
                 return;
             }
-            mImageAdaptor = new ImageAdaptor(getActivity(),result);
-            gridView.setAdapter(mImageAdaptor);
+            mImageAdapter = new ImageAdapter(getActivity(),result);
+            gridView.setAdapter(mImageAdapter);
         }
     }
 

@@ -15,12 +15,12 @@ import java.util.ArrayList;
  * Created by y_sam on 11/25/2016.
  */
 
-public class ImageAdaptor extends BaseAdapter {
+public class ImageAdapter extends BaseAdapter {
 
     private ArrayList<Movie> movies;
     private Context context;
 
-    public ImageAdaptor(Context context, ArrayList<Movie> movies) {
+    public ImageAdapter(Context context, ArrayList<Movie> movies) {
         this.movies = movies;
         this.context = context;
     }
