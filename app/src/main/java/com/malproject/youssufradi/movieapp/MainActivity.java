@@ -1,8 +1,8 @@
 package com.malproject.youssufradi.movieapp;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -13,7 +13,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 //        if(savedInstanceState == null)
-//            getSupportFragmentManager().beginTransaction().add(R.id.activity_fragment, new MainFragment()).commit();
+    //            getSupportFragmentManager().beginTransaction().add(R.id.activity_fragment, new MainFragment()).commit();
+        String tablet = getResources().getString(R.string.isTablet);
+        if(tablet.equals("true")){
+            getSupportFragmentManager().beginTransaction().add(R.id.detail_container,new DetailFragment()).commit();
+        }
     }
 
     @Override

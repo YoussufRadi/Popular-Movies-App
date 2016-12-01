@@ -10,4 +10,11 @@
     tools:context="com.malproject.youssufradi.movieapp.MainActivity">
 
 <include layout="@layout/activity_fragment"/>
+
+<LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:id="@+id/detail_container"
+    android:orientation="vertical"
+    android:layout_weight="0" />
 </RelativeLayout>

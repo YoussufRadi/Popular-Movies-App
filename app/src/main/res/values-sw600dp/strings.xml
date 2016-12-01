@@ -5,8 +5,7 @@
     <string name="title_activity_detail">DetailActivity</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="isTablet">false</string>
-
+    <string name="isTablet">true</string>
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
