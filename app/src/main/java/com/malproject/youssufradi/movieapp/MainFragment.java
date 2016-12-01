@@ -40,7 +40,7 @@ public class MainFragment extends Fragment {
     private ImageAdapter mImageAdapter;
     private GridView gridView;
     private ArrayList<Movie> movies;
-    private ArrayList<Movie> favourites;
+    private ArrayList<Movie> favourites = new ArrayList<Movie>( );
 
     public MainFragment() {
         // Required empty public constructor
@@ -51,11 +51,14 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if(savedInstanceState != null && savedInstanceState.containsKey("Movies"))
             movies = savedInstanceState.<Movie>getParcelableArrayList("Movies");
+        if(savedInstanceState != null && savedInstanceState.containsKey("favourites"))
+            favourites = savedInstanceState.<Movie>getParcelableArrayList("favourites");
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("Movies", movies);
+        outState.putParcelableArrayList("favourites", movies);
         super.onSaveInstanceState(outState);
     }
 
@@ -78,12 +81,6 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-//        ArrayList<String> fake = new ArrayList<String>();
-//        fake.add("/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg");
-//        fake.add("/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg");
-//        fake.add("/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg");
-//        fake.add("/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg");
         gridView = (GridView) rootView.findViewById(R.id.grid_view);
         updateSearch();
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -98,7 +95,7 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
-    public void getDataFromDB(){
+    public boolean getDataFromDB(){
         SQLiteDatabase db = new MovieDbHelper(getActivity()).getWritableDatabase();
         Cursor movieCursor = db.query(
                 MovieContract.MovieEntry.TABLE_NAME,  // Table to Query
@@ -109,7 +106,8 @@ public class MainFragment extends Fragment {
                 null, // columns to filter by row groups
                 null  // sort order
         );
-        if(movieCursor.moveToFirst()){
+        boolean cursor = movieCursor.moveToFirst();
+        if(cursor){
             int movieId = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
             int title = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE);
             int poster = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER);
@@ -123,12 +121,13 @@ public class MainFragment extends Fragment {
                 String COLUMN_PLOT = movieCursor.getString(plot);
                 String COLUMN_DATE = movieCursor.getString(date);
                 String COLUMN_RATING = movieCursor.getString(rating);
-                Log.d(COLUMN_MOVIE_ID + COLUMN_TITLE + COLUMN_POSTER,COLUMN_PLOT + COLUMN_RATING + COLUMN_DATE);
+                Log.d(TAG,COLUMN_MOVIE_ID + COLUMN_TITLE + COLUMN_POSTER+COLUMN_PLOT + COLUMN_RATING + COLUMN_DATE);
                 favourites.add(new Movie(COLUMN_MOVIE_ID,COLUMN_TITLE,COLUMN_POSTER,COLUMN_PLOT,COLUMN_RATING,COLUMN_DATE));
             } while(movieCursor.moveToNext());
         }
         movieCursor.close();
         db.close();
+        return cursor;
     }
 
     @Override
@@ -142,9 +141,9 @@ public class MainFragment extends Fragment {
         String sortKey = prefs.getString(getString(R.string.sort_value), "popular");
         Toast.makeText(getActivity(),sortKey,Toast.LENGTH_SHORT).show();
         if(sortKey.equals("favourites")){
-            getDataFromDB();
+            if(getDataFromDB()){
             mImageAdapter = new ImageAdapter(getActivity(),favourites);
-            gridView.setAdapter(mImageAdapter);
+            gridView.setAdapter(mImageAdapter);}
         }
         else
             new FetchDataFromApi().execute(sortKey);
