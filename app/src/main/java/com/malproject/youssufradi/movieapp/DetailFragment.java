@@ -1,6 +1,7 @@
 package com.malproject.youssufradi.movieapp;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.malproject.youssufradi.movieapp.data.MovieDbHelper;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -98,6 +100,12 @@ public class DetailFragment extends Fragment {
         }
         return rootView;
     }
+
+
+    public void insertInDB(){
+        SQLiteDatabase db = new MovieDbHelper(getActivity()).getWritableDatabase();
+    }
+
 
     class FetchDataFromApi extends AsyncTask<String,Void,ArrayList<Info>> {
 
