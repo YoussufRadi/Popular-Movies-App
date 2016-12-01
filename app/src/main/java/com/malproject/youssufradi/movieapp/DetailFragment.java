@@ -48,8 +48,20 @@ public class DetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState != null && savedInstanceState.containsKey("trailers")) {
+            trailers = savedInstanceState.<Info>getParcelableArrayList("trailers");
+        }
+        if(savedInstanceState != null && savedInstanceState.containsKey("reviews")) {
+            reviews = savedInstanceState.<Info>getParcelableArrayList("reviews");
+        }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("trailers",trailers);
+        outState.putParcelableArrayList("reviews",reviews);
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
