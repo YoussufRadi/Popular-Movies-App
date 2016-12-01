@@ -10,7 +10,7 @@ public class MovieContract {
 
     public static final class MovieEntry implements BaseColumns{
         public static final String TABLE_NAME = "movies";
-        public static final String COLUMN_MOVIE_ID = "title";
+        public static final String COLUMN_MOVIE_ID = "movieId";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_POSTER = "poster";
         public static final String COLUMN_PLOT = "plot";

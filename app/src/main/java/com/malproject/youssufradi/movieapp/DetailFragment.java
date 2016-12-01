@@ -1,5 +1,6 @@
 package com.malproject.youssufradi.movieapp;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -11,11 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.malproject.youssufradi.movieapp.data.MovieContract;
 import com.malproject.youssufradi.movieapp.data.MovieDbHelper;
 import com.squareup.picasso.Picasso;
 
@@ -42,6 +45,7 @@ public class DetailFragment extends Fragment {
     private ListView trailerList;
     private InfoAdapter reviewInfoAdapter;
     private InfoAdapter trailerInfoAdapter;
+
 
     public DetailFragment() {
         // Required empty public constructor
@@ -87,6 +91,14 @@ public class DetailFragment extends Fragment {
             Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w500/" + detailMovie.getPoster()).into((ImageView) rootView.findViewById(R.id.movie_poster));
             reviewList = (ListView) rootView.findViewById(R.id.review_list);
             trailerList = (ListView) rootView.findViewById(R.id.trailer_list);
+            ImageButton favourite = (ImageButton) rootView.findViewById(R.id.movie_favorite_button);
+            favourite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    insertInDB(detailMovie.getId(),detailMovie.getTitle(),detailMovie.getPoster(),
+                            detailMovie.getPlot(),detailMovie.getReleaseDate(),detailMovie.getUserRating());
+                }
+            });
             //new FetchDataFromApi().execute("reviews");
             new FetchDataFromApi().execute("videos");
             trailerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -102,8 +114,30 @@ public class DetailFragment extends Fragment {
     }
 
 
-    public void insertInDB(){
+    public void insertInDB(String movieId, String title, String poster, String plot, String date, String rating){
         SQLiteDatabase db = new MovieDbHelper(getActivity()).getWritableDatabase();
+        ContentValues movie = DetailFragment.createMovieValues(movieId,title,poster,plot,date,rating);
+        try {
+            long movieID = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, movie);
+            if(movieID != -1)
+                Toast.makeText(getActivity(),"Movie added to favourites", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT).show();
+        }catch(Exception e){
+            Toast.makeText(getActivity(),"Item Already inserted", Toast.LENGTH_SHORT).show();
+        }
+        db.close();
+    }
+
+    static ContentValues createMovieValues(String movieId, String title, String poster, String plot, String date, String rating) {
+        ContentValues movieValues = new ContentValues();
+        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER, poster);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_PLOT, plot);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_DATE, date);
+        movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
+        return movieValues;
     }
 
 

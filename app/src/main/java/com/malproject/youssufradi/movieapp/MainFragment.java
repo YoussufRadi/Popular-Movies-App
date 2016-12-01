@@ -2,6 +2,8 @@ package com.malproject.youssufradi.movieapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +17,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
+
+import com.malproject.youssufradi.movieapp.data.MovieContract;
+import com.malproject.youssufradi.movieapp.data.MovieDbHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +40,7 @@ public class MainFragment extends Fragment {
     private ImageAdapter mImageAdapter;
     private GridView gridView;
     private ArrayList<Movie> movies;
+    private ArrayList<Movie> favourites;
 
     public MainFragment() {
         // Required empty public constructor
@@ -79,7 +85,7 @@ public class MainFragment extends Fragment {
 //        fake.add("/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg");
 //        fake.add("/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg");
         gridView = (GridView) rootView.findViewById(R.id.grid_view);
-        new FetchDataFromApi().execute("popular");
+        updateSearch();
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -92,6 +98,39 @@ public class MainFragment extends Fragment {
         return rootView;
     }
 
+    public void getDataFromDB(){
+        SQLiteDatabase db = new MovieDbHelper(getActivity()).getWritableDatabase();
+        Cursor movieCursor = db.query(
+                MovieContract.MovieEntry.TABLE_NAME,  // Table to Query
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null, // columns to group by
+                null, // columns to filter by row groups
+                null  // sort order
+        );
+        if(movieCursor.moveToFirst()){
+            int movieId = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
+            int title = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE);
+            int poster = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER);
+            int plot = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_PLOT);
+            int date = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_DATE);
+            int rating = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATING);
+            do {
+                String COLUMN_MOVIE_ID = movieCursor.getString(movieId);
+                String COLUMN_TITLE = movieCursor.getString(title);
+                String COLUMN_POSTER = movieCursor.getString(poster);
+                String COLUMN_PLOT = movieCursor.getString(plot);
+                String COLUMN_DATE = movieCursor.getString(date);
+                String COLUMN_RATING = movieCursor.getString(rating);
+                Log.d(COLUMN_MOVIE_ID + COLUMN_TITLE + COLUMN_POSTER,COLUMN_PLOT + COLUMN_RATING + COLUMN_DATE);
+                favourites.add(new Movie(COLUMN_MOVIE_ID,COLUMN_TITLE,COLUMN_POSTER,COLUMN_PLOT,COLUMN_RATING,COLUMN_DATE));
+            } while(movieCursor.moveToNext());
+        }
+        movieCursor.close();
+        db.close();
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -100,10 +139,15 @@ public class MainFragment extends Fragment {
 
     public void updateSearch(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortKey = prefs.getString(getString(R.string.sort_value),
-                            getString(R.string.sort_value));
+        String sortKey = prefs.getString(getString(R.string.sort_value), "popular");
         Toast.makeText(getActivity(),sortKey,Toast.LENGTH_SHORT).show();
-        new FetchDataFromApi().execute(sortKey);
+        if(sortKey.equals("favourites")){
+            getDataFromDB();
+            mImageAdapter = new ImageAdapter(getActivity(),favourites);
+            gridView.setAdapter(mImageAdapter);
+        }
+        else
+            new FetchDataFromApi().execute(sortKey);
     }
 
     /**
