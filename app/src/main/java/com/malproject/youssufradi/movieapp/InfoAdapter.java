@@ -56,7 +56,8 @@ public class InfoAdapter extends BaseAdapter {
         TextView author = (TextView) detailView.findViewById(R.id.review_author);
         TextView content = (TextView) detailView.findViewById(R.id.review_content);
         author.setText(info.get(i).getAuthor());
-        Log.d(TAG, info.get(i).getAuthor());
+        Log.i(TAG, info.get(i).getAuthor());
+        Log.i(TAG, info.get(i).getDetails());
         content.setText(info.get(i).getDetails());
         return detailView;
     }

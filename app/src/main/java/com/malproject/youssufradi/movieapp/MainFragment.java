@@ -1,6 +1,5 @@
 package com.malproject.youssufradi.movieapp;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -88,8 +87,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Movie movieDetails = mImageAdapter.getItem(i);
-                Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("Movie",movieDetails);
-                startActivity(intent);
+                ((MainActivity)getActivity()).setDetailFratgment(movieDetails);
             }
         });
         return rootView;
@@ -114,6 +112,7 @@ public class MainFragment extends Fragment {
             int plot = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_PLOT);
             int date = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_DATE);
             int rating = movieCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATING);
+            favourites = new ArrayList<>();
             do {
                 String COLUMN_MOVIE_ID = movieCursor.getString(movieId);
                 String COLUMN_TITLE = movieCursor.getString(title);

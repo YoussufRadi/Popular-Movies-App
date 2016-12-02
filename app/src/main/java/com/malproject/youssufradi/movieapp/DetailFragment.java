@@ -2,6 +2,7 @@ package com.malproject.youssufradi.movieapp;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -45,6 +46,7 @@ public class DetailFragment extends Fragment {
     private ListView trailerList;
     private InfoAdapter reviewInfoAdapter;
     private InfoAdapter trailerInfoAdapter;
+    View rootView;
 
 
     public DetailFragment() {
@@ -69,63 +71,74 @@ public class DetailFragment extends Fragment {
         super.onSaveInstanceState(outState);
     }
 
+    public void updateMovie(Movie movie){
+        this.detailMovie = movie;
+        updateView();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView =  inflater.inflate(R.layout.fragment_detail, container, false);
+        rootView =  inflater.inflate(R.layout.fragment_detail, container, false);
         Intent intent = getActivity().getIntent();
-        if (intent != null) {
+        if (intent.getParcelableExtra("Movie") != null) {
             detailMovie = (Movie) intent.getParcelableExtra("Movie");
             Log.d(TAG, detailMovie+"");
             if(detailMovie == null)
                 return rootView;
-            ((TextView) rootView.findViewById(R.id.movie_title))
-                    .setText(detailMovie.getTitle());
-            ((TextView) rootView.findViewById(R.id.movie_overview))
-                    .setText(detailMovie.getPlot());
-            ((TextView) rootView.findViewById(R.id.movie_average_rating))
-                    .setText(detailMovie.getUserRating());
-            ((TextView) rootView.findViewById(R.id.movie_release_date))
-                    .setText(detailMovie.getReleaseDate());
-            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w500/" + detailMovie.getPoster()).into((ImageView) rootView.findViewById(R.id.movie_poster));
-            reviewList = (ListView) rootView.findViewById(R.id.review_list);
-            trailerList = (ListView) rootView.findViewById(R.id.trailer_list);
-            ImageButton favourite = (ImageButton) rootView.findViewById(R.id.movie_favorite_button);
-            favourite.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    insertInDB(detailMovie.getId(),detailMovie.getTitle(),detailMovie.getPoster(),
-                            detailMovie.getPlot(),detailMovie.getReleaseDate(),detailMovie.getUserRating());
-                }
-            });
-            //new FetchDataFromApi().execute("reviews");
-            new FetchDataFromApi().execute("videos");
-            trailerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Info info = trailerInfoAdapter.getItem(i);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="+info.getDetails()));
-                    startActivity(intent);
-                }
-            });
+            updateView();
         }
         return rootView;
+    }
+
+    public void updateView(){
+        ((TextView) rootView.findViewById(R.id.movie_title))
+                .setText(detailMovie.getTitle());
+        ((TextView) rootView.findViewById(R.id.movie_overview))
+                .setText(detailMovie.getPlot());
+        ((TextView) rootView.findViewById(R.id.movie_average_rating))
+                .setText(detailMovie.getUserRating());
+        ((TextView) rootView.findViewById(R.id.movie_release_date))
+                .setText(detailMovie.getReleaseDate());
+        Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w500/" + detailMovie.getPoster()).into((ImageView) rootView.findViewById(R.id.movie_poster));
+        reviewList = (ListView) rootView.findViewById(R.id.review_list);
+        trailerList = (ListView) rootView.findViewById(R.id.trailer_list);
+        ImageButton favourite = (ImageButton) rootView.findViewById(R.id.movie_favorite_button);
+        favourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                insertInDB(detailMovie.getId(),detailMovie.getTitle(),detailMovie.getPoster(),
+                        detailMovie.getPlot(),detailMovie.getReleaseDate(),detailMovie.getUserRating());
+            }
+        });
+        //new FetchDataFromApi().execute("reviews");
+        new FetchDataFromApi().execute("videos");
+        trailerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Info info = trailerInfoAdapter.getItem(i);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="+info.getDetails()));
+                startActivity(intent);
+            }
+        });
     }
 
 
     public void insertInDB(String movieId, String title, String poster, String plot, String date, String rating){
         SQLiteDatabase db = new MovieDbHelper(getActivity()).getWritableDatabase();
+        Cursor movieCursor = db.rawQuery("SELECT * FROM " + MovieContract.MovieEntry.TABLE_NAME + " WHERE " + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = " + movieId,null);
+        boolean cursor = movieCursor.getCount() == 0;
         ContentValues movie = DetailFragment.createMovieValues(movieId,title,poster,plot,date,rating);
-        try {
+        if(cursor) {
             long movieID = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, movie);
             if(movieID != -1)
                 Toast.makeText(getActivity(),"Movie added to favourites", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT).show();
-        }catch(Exception e){
-            Toast.makeText(getActivity(),"Item Already inserted", Toast.LENGTH_SHORT).show();
-        }
+        }else
+            Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT).show();
+        movieCursor.close();
         db.close();
     }
 
@@ -157,6 +170,7 @@ public class DetailFragment extends Fragment {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
+                Log.i("movie detail : ", detailMovie.getId());
                 final String MOVIES_BASE_URL =
                         "http://api.themoviedb.org/3/movie/" + detailMovie.getId() + "/"+ params[0]+"?api_key=8c79e11ad73fea8dbe678fee8de573e6";
 

@@ -1,38 +1,14 @@
-<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--tools:context="com.malproject.youssufradi.movieapp.DetailFragment">-->
-
-    <!--&lt;!&ndash; TODO: Update blank fragment layout &ndash;&gt;-->
-    <!--<TextView-->
-        <!--android:layout_width="191dp"-->
-        <!--android:layout_height="44dp"-->
-        <!--android:id="@+id/movie_title" />-->
-    <!--<ImageView-->
-        <!--android:id="@+id/movie_poster"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent" />-->
-    <!--<TextView-->
-        <!--android:id="@+id/movie_plot"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent" />-->
-    <!--<TextView-->
-        <!--android:id="@+id/movie_rating"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent" />-->
-    <!--<TextView-->
-        <!--android:id="@+id/movie_date"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent" />-->
-
-<!--</LinearLayout>-->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context="com.malproject.youssufradi.movieapp.DetailFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -48,7 +24,7 @@
 
             <ImageView
                 android:id="@+id/movie_poster"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"/>
 
         </FrameLayout>
@@ -115,4 +91,5 @@
             android:layout_marginTop="70dp" />
 
     </RelativeLayout>
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>
